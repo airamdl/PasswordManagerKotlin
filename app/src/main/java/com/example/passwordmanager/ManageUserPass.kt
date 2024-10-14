@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter
 
 class ManageUserPass {
     companion object {
-        fun addUser(context: Context, tittle: String, user: String, pass: String, fileName: String) : String {
+        fun addUser(context: Context, tittle: String, user: String, pass: String, fileName: String): String {
             val storageState = Environment.getExternalStorageState()
 
             if (storageState == Environment.MEDIA_MOUNTED) {
@@ -21,11 +21,11 @@ class ManageUserPass {
                 try {
                     val outputStream = FileOutputStream(file, true)
                     val writer = OutputStreamWriter(outputStream)
-                    val userData = UserData(tittle, user,pass)
-                    writer.append("$userData;")
+                    val userData = UserData(tittle, user, pass)
+                    writer.append("$userData\n")
                     writer.close()
 
-                    return "Usuario guardado en $directory $fileName"
+                    return "Usuario guardado en $directory/$fileName"
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return "Error al guardar el usuario"
@@ -50,15 +50,15 @@ class ManageUserPass {
                     Log.i("DAM2", "Contenido completo del archivo: $text")
                     reader.close()
 
-                    val userEntries = text.split(";").filter { it.isNotBlank() }
+                    // Procesar cada línea individualmente en lugar de dividir por ";"
+                    val userEntries = text.lines().filter { it.isNotBlank() }
                     Log.i("DAM2", "Contenido dividido en entradas: ${userEntries.joinToString()}")
 
                     userEntries.forEach { entry ->
-                        // Nueva expresión regular para hacer coincidir el formato de UserData actualizado
                         val match = Regex("""UserData\(tittle=(.*?), user=(.*?), pass=(.*?)\)""").find(entry)
                         if (match != null) {
                             val (tittle, user, pass) = match.destructured
-                            Log.i("DAM2", "Datos extraídos - Usuario: $user, Contraseña: $pass")
+                            Log.i("DAM2", "Datos extraídos - Título: $tittle, Usuario: $user, Contraseña: $pass")
                             userList.add(UserData(tittle, user, pass))
                         } else {
                             Log.i("DAM2", "No coincide el regex con la entrada: $entry")
