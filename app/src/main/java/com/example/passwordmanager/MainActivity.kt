@@ -61,18 +61,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Composable
-//fun OnSubmit(){
-//    var submit by remember { mutableStateOf("") }
-//    TextField(
-//        value = submit,
-//        onValueChange = { newText ->
-//            submit = newText.trimStart { it == '0' }
-//        }
-//    )
-//
-//}
-
 
 val fileprueba = "users.txt"
 @Composable
