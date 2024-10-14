@@ -93,6 +93,7 @@ fun PassUserInput() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.padding(10.dp))
         TextField(
             value = title,
             onValueChange = { title = it },
@@ -106,7 +107,7 @@ fun PassUserInput() {
         TextField(
             value = user,
             onValueChange = { user = it },
-            label = { Text("Usuario") },
+            label = { Text("Introduce your User") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
