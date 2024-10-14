@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.password
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,13 +73,13 @@ class MainActivity : ComponentActivity() {
 //
 //}
 
-val users = mutableListOf<UserData>()
+
 val fileprueba = "users.txt"
 @Composable
 @Preview
 fun PassUserInput() {
     val myContext = LocalContext.current
-
+    val users = readUsers(myContext, fileprueba)
     var title by rememberSaveable { mutableStateOf("") }
     var user by rememberSaveable { mutableStateOf("") }
     var pass by rememberSaveable { mutableStateOf("") }
@@ -138,13 +140,36 @@ fun PassUserInput() {
 
         Spacer(modifier = Modifier.padding(5.dp))
 
-        (Button
-            (
-            onClick = {ManageUserPass.readUsers(myContext, fileprueba )}
-        )
-        {
-            Text(text = "Read Users")
-        })
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            items(users) { user ->
+                Text(text = "Título: ${user.tittle}")
+                Text(text = "Nombre: ${user.user}")
+                Text(text = "Contraseña: ${user.pass}")
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Button(onClick =
+                    {ManageUserPass.readUsers(myContext, fileprueba )}
+                    ) {
+                        Text(text = "Editar")
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Button(onClick =
+                    {ManageUserPass.readUsers(myContext, fileprueba )}
+                    ) {
+                        Text(text = "Eliminar")
+                    }
+                }
+            }
+
+
+
+        }
+
 
 
 
