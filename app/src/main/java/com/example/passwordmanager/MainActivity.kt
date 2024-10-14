@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.password
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -132,25 +134,38 @@ fun PassUserInput() {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(16.dp)
                 .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 .padding(8.dp)
+
+
         ) {
             items(users) { user ->
-                Text(text = "Título: ${user.tittle}")
-                Text(text = "Nombre: ${user.user}")
-                Text(text = "Contraseña: ${user.pass}")
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button(onClick =
-                    {ManageUserPass.readUsers(myContext, fileprueba )}
-                    ) {
-                        Text(text = "Editar")
-                    }
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Button(onClick =
-                    {ManageUserPass.readUsers(myContext, fileprueba )}
-                    ) {
-                        Text(text = "Eliminar")
+                Column(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                        .background(Color.hsv(0.0F, 0.0F, 0.93F, 0.93F))
+                        .padding(5.dp)
+
+
+                ) {
+
+                    Text(text = "Título: ${user.tittle}")
+                    Text(text = "Nombre: ${user.user}")
+                    Text(text = "Contraseña: ${user.pass}")
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        Button(onClick =
+                        {ManageUserPass.readUsers(myContext, fileprueba )}
+                        ) {
+                            Text(text = "Editar")
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Button(onClick =
+                        {ManageUserPass.readUsers(myContext, fileprueba )}
+                        ) {
+                            Text(text = "Eliminar")
+                        }
                     }
                 }
             }
