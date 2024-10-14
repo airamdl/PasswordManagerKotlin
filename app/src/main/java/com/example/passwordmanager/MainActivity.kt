@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.passwordmanager.ManageUserPass.Companion.addUser
 import com.example.passwordmanager.ManageUserPass.Companion.readUsers
+import com.example.passwordmanager.ManageUserPass.Companion.updateUser
+import com.example.passwordmanager.ManageUserPass.Companion.deleteUser
 import com.example.passwordmanager.ui.theme.PasswordManagerTheme
+import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,16 +51,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PasswordManagerTheme {
                 Scaffold(content = { padding ->
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                            .padding(16.dp)
-                    ) {
-                        PassUserInput()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        UserList()
-                    }
+                    UserListScreen(modifier = Modifier.padding(padding))
                 })
             }
         }
@@ -66,11 +61,21 @@ class MainActivity : ComponentActivity() {
 const val fileName = "users.txt"
 
 @Composable
-fun PassUserInput() {
-    val myContext = LocalContext.current
+fun UserInputForm(
+    editingUser: UserData? = null,
+    onSave: (UserData) -> Unit = {},
+    onClearEditing: () -> Unit = {}
+) {
+    val context = LocalContext.current
     var title by rememberSaveable { mutableStateOf("") }
-    var user by rememberSaveable { mutableStateOf("") }
-    var pass by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(editingUser) {
+        title = editingUser?.tittle ?: ""
+        username = editingUser?.user ?: ""
+        password = editingUser?.pass ?: ""
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -79,70 +84,92 @@ fun PassUserInput() {
         TextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Introduce a title") },
+            label = { Text("Introduce el título") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(10.dp))
         TextField(
-            value = user,
-            onValueChange = { user = it },
-            label = { Text("Introduce your User") },
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Introduce el usuario") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(10.dp))
         TextField(
-            value = pass,
-            onValueChange = { pass = it },
-            label = { Text("Introduce your password") },
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Introduce la contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Button(onClick = {
-            addUser(myContext, title, user, pass, fileName)
+            if (editingUser != null) {
+                val updatedUser = UserData(editingUser.id, title, username, password)
+                updateUser(context, updatedUser, fileName)
+                onClearEditing()
+                onSave(updatedUser)
+            } else {
+                val newUser = UserData(UUID.randomUUID().toString(), title, username, password)
+                addUser(context, newUser, fileName)
+                onSave(newUser)
+            }
         }) {
-            Text(text = "Save Pass")
+            Text(text = if (editingUser != null) "Actualizar Usuario" else "Guardar Usuario")
         }
     }
 }
 
 @Composable
-fun UserList() {
-    val myContext = LocalContext.current
-    val users = remember { readUsers(myContext, fileName) }
+fun UserListScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    var users by remember { mutableStateOf(readUsers(context, fileName)) }
+    var editingUser by remember { mutableStateOf<UserData?>(null) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .padding(8.dp)
-    ) {
-        items(users) { user ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                    .background(Color.hsv(0.0F, 0.0F, 0.93F, 0.93F))
-                    .padding(5.dp)
-            ) {
-                Text(text = "Título: ${user.tittle}")
-                Text(text = "Nombre: ${user.user}")
-                Text(text = "Contraseña: ${user.pass}")
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button(onClick = {
-                        // Aquí va la lógica de edición
-                    }) {
-                        Text(text = "Editar")
-                    }
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Button(onClick = {
-                        // Aquí va la lógica para eliminar
-                    }) {
-                        Text(text = "Eliminar")
+    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+        UserInputForm(
+            editingUser = editingUser,
+            onSave = {
+                users = readUsers(context, fileName)
+                editingUser = null
+            },
+            onClearEditing = { editingUser = null }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            items(users) { user ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                        .background(Color.hsv(0.0F, 0.0F, 0.93F, 0.93F))
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Título: ${user.tittle}")
+                    Text(text = "Usuario: ${user.user}")
+                    Text(text = "Contraseña: ${user.pass}")
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        Button(onClick = {
+                            editingUser = user
+                        }) {
+                            Text(text = "Editar")
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Button(onClick = {
+                            deleteUser(context, user, fileName)
+                            users = readUsers(context, fileName)
+                        }) {
+                            Text(text = "Eliminar")
+                        }
                     }
                 }
             }
