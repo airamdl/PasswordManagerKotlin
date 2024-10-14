@@ -1,27 +1,32 @@
 package com.example.passwordmanager
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,6 +39,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.passwordmanager.ManageUserPass.Companion.addUser
 import com.example.passwordmanager.ui.theme.PasswordManagerTheme
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
@@ -63,16 +69,13 @@ class MainActivity : ComponentActivity() {
 //
 //}
 
+
 @Composable
 @Preview
 fun PassUserInput() {
     var title by rememberSaveable { mutableStateOf("") }
     var user by rememberSaveable { mutableStateOf("") }
     var pass by rememberSaveable { mutableStateOf("") }
-
-    var submit by remember { mutableStateOf("") }
-
-
 
 
 
@@ -120,14 +123,41 @@ fun PassUserInput() {
 
         Spacer(modifier = Modifier.padding(10.dp))
 
-        (Button(
-            onClick = onSubmit
+        (Button
+            (
+            onClick = addUser()
         )
         {
             Text(text = "Save Pass")
         })
+
+        Spacer(modifier = Modifier.padding(20.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(16.dp)
+        ) {
+            Text(text = "Título: ${userInfo.title}")
+            Text(text = "Nombre: ${userInfo.name}")
+            Text(text = "Contraseña: ${userInfo.password}")
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = onEdit) {
+                    Text(text = "Editar")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = onDelete) {
+                    Text(text = "Eliminar")
+                }
+            }
+        }
     }
 }
+
+
+
 
 
 
