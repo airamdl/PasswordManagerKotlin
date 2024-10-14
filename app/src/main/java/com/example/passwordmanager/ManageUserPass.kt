@@ -76,3 +76,4 @@ class ManageUserPass {
 }
 
 data class UserData(val tittle: String, val user: String, val pass: String)
+

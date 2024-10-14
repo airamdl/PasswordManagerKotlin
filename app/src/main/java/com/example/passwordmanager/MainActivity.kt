@@ -34,12 +34,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passwordmanager.ManageUserPass.Companion.addUser
+import com.example.passwordmanager.ManageUserPass.Companion.readUsers
 import com.example.passwordmanager.ui.theme.PasswordManagerTheme
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
@@ -49,7 +51,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PasswordManagerTheme {
-                Scaffold(content = { padding ->
+                Scaffold(content = { padding -> Modifier.padding(8.dp)
                     PassUserInput()
                 })
             }
@@ -69,10 +71,13 @@ class MainActivity : ComponentActivity() {
 //
 //}
 
-
+val users = mutableListOf<UserData>()
+val fileprueba = "users.txt"
 @Composable
 @Preview
 fun PassUserInput() {
+    val myContext = LocalContext.current
+
     var title by rememberSaveable { mutableStateOf("") }
     var user by rememberSaveable { mutableStateOf("") }
     var pass by rememberSaveable { mutableStateOf("") }
@@ -117,42 +122,33 @@ fun PassUserInput() {
 
         Text(
             text = "Remember to check the password and edit if you need",
-            fontSize = 30.sp,
+            fontSize = 15.sp,
             color = Color.LightGray
         )
 
-        Spacer(modifier = Modifier.padding(10.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
 
         (Button
             (
-            onClick = addUser()
+            onClick = {ManageUserPass.addUser(myContext, title, user, pass, fileprueba )}
         )
         {
             Text(text = "Save Pass")
         })
 
-        Spacer(modifier = Modifier.padding(20.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                .padding(16.dp)
-        ) {
-            Text(text = "Título: ${userInfo.title}")
-            Text(text = "Nombre: ${userInfo.name}")
-            Text(text = "Contraseña: ${userInfo.password}")
+        Spacer(modifier = Modifier.padding(5.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Button(onClick = onEdit) {
-                    Text(text = "Editar")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = onDelete) {
-                    Text(text = "Eliminar")
-                }
-            }
-        }
+        (Button
+            (
+            onClick = {ManageUserPass.readUsers(myContext, fileprueba )}
+        )
+        {
+            Text(text = "Read Users")
+        })
+
+
+
+
     }
 }
 
